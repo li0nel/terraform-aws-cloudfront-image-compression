@@ -8,6 +8,8 @@ To do so, prefix all your images with `https://images.your_domain.com/` to compr
 
 ... will compress then cache the origin image to a width of 200px and a preserved aspect ratio.
 
+Great to generate [responsive images tags](https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images) from one single image.
+
 # Image compression "at the edge"
 
 Terraform module which lets you supercharge your website by automatically compressing your images on CloudFront, using Lambda@Edge
