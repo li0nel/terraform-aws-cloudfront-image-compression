@@ -4,34 +4,13 @@ const https = require('https')
 const url = require('url')
 const Sharp = require('sharp')
 
-// headers that cloudfront does not allow in the http response
-const blacklistedHeaders = [
-    /^connection$/i,
-    /^content-length$/i,
-    /^expect$/i,
-    /^keep-alive$/i,
-    /^proxy-authenticate$/i,
-    /^proxy-authorization$/i,
-    /^proxy-connection$/i,
-    /^trailer$/i,
-    /^upgrade$/i,
-    /^x-accel-buffering$/i,
-    /^x-accel-charset$/i,
-    /^x-accel-limit-rate$/i,
-    /^x-accel-redirect$/i,
-    /^X-Amz-Cf-.*/i,
-    /^X-Amzn-.*/i,
-    /^X-Cache.*/i,
-    /^X-Edge-.*/i,
-    /^X-Forwarded-Proto.*/i,
-    /^X-Real-IP$/i
-];
-
 const domains = [];
 
 exports.handler = (event, context, callback) => {
     const request = event.Records[0].cf.request
     const origin = url.parse(request.uri.substring(1))
+
+    console.log(origin)
 
     const getFile = origin.protocol === 'https:' ?
         https.get :
@@ -42,10 +21,13 @@ exports.handler = (event, context, callback) => {
     const width = Math.min(options.width || maxSize, maxSize)
     const height = Math.min(options.height || maxSize, maxSize)
 
+    console.log(width)
+    console.log(height)
+
     // make sure input values are numbers
     if (Number.isNaN(width) || Number.isNaN(height) || origin.protocol === null) {
         console.log('Invalid input')
-        context.succeed({
+        callback(null, {
             status: '400',
             statusDescription: 'Invalid input'
         })
@@ -54,7 +36,7 @@ exports.handler = (event, context, callback) => {
     // whitelisting of domains
     if (domains.length && domains.indexOf(origin.host) === -1) {
         console.log('Invalid domain')
-        context.succeed({
+        callback(null, {
             status: '403',
             statusDescription: 'Invalid domain'
         })
@@ -63,21 +45,6 @@ exports.handler = (event, context, callback) => {
     // download the file from the origin server
     getFile(origin.href, (res) => {
         const statusCode = res.statusCode
-        // grab headers from the origin request and reformat them
-        // to match the lambda@edge return format
-        const originHeaders = Object.keys(res.headers)
-            // some headers we get back from the origin
-            // must be filtered out because they are blacklisted by cloudfront
-            .filter((header) => blacklistedHeaders.every((blheader) => !blheader.test(header)))
-            .reduce((acc, header) => {
-                acc[header.toLowerCase()] = [
-                    {
-                        key: header,
-                        value: res.headers[header]
-                    }
-                ]
-                return acc
-            }, {})
 
         if (statusCode === 200) {
             var data = []
@@ -97,18 +64,23 @@ exports.handler = (event, context, callback) => {
                         })
                         .max()
                         .toBuffer()
-                        .then( (data) =>  {
+                        .then( (_data) =>  {
                             console.log('Sharp finished')
-                            context.succeed({
+                            callback(null, {
                                 bodyEncoding: 'base64',
-                                body: new Buffer(data, 'binary').toString('base64'),
-                                headers: originHeaders,
+                                body: new Buffer(_data, 'binary').toString('base64'),
+                                headers: {
+                                    'cache-control': [{
+                                        key: 'Cache-Control',
+                                        value: 'max-age=100'
+                                    }]
+                                },
                                 status: '200',
                                 statusDescription: 'OK'
                             })
                         }).catch( (err) =>  {
                             console.log(err)
-                            context.succeed({
+                            callback(null, {
                                 status: '302',
                                 statusDescription: 'Found',
                                 headers: {
@@ -122,14 +94,14 @@ exports.handler = (event, context, callback) => {
                 } catch(e) {
                     console.log('Sharp error')
                     console.log(e.stderr)
-                    context.succeed({
+                    callback(null, {
                         status: '500',
                         statusDescription: 'Error resizing image'
                     })
                 }
             }).on('error', (e) => {
                 console.log(e)
-                context.succeed({
+                callback(null, {
                     status: '302',
                     statusDescription: 'Found',
                     headers: {
@@ -144,7 +116,7 @@ exports.handler = (event, context, callback) => {
             // grap the status code from the origin request
             // and return to the viewer
             console.log('statusCode: ', statusCode)
-            context.succeed({
+            callback(null, {
                 status: statusCode.toString(),
                 headers: originHeaders
             })

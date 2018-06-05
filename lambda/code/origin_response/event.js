@@ -48,7 +48,7 @@ module.exports = {
                 }
             },
             "querystring": "width=264",
-            "uri": "/https://www.theo2.co.uk/assets/img/Lady-Gaga-Social-Assets-Facebook20-7fab08694a.jpg"
+            "uri": "/https://raw.githubusercontent.com/li0nel/terraform-aws-cloudfront-image-compression/master/image.png"
         },
         "response": {
             "headers": {
