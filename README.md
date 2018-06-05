@@ -12,6 +12,8 @@ To do so, prefix all your images with `https://images.your_domain.com/` to compr
 
 Terraform module which lets you supercharge your website by automatically compressing your images on CloudFront, using Lambda@Edge
 
+Based on https://github.com/lovell/sharp for faster compression than ImageMagick
+
 These types of resources are supported:
 
 * [CloudFront Distribution](https://www.terraform.io/docs/providers/aws/r/cloudfront_distribution.html)
