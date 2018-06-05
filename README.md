@@ -1,4 +1,4 @@
-TL;DR;
+# TL;DR;
 
 This Terraform script lets you deploy a Lambda function on CloudFront that will compress your images on demand.
 You can use the Lambda function on an existing distribution, or create a separate one to serve your files stored in S3.
@@ -25,14 +25,17 @@ However it does not work if images are hosted by a third-party partner and when 
 
 This CloudFront-based Lambda function will let you update the image size at any time.
 
-![original image (size = 527KB)](https://raw.githubusercontent.com/li0nel/terraform-aws-cloudfront-image-compression/master/image.png)
-
+For an original image of 527KB:
+* width 400px, size 26KB
 ![width = 400 (size = 26KB)](https://images.getlionel.com/https://raw.githubusercontent.com/li0nel/terraform-aws-cloudfront-image-compression/master/image.png?width=400)
 
+* width 300px, size 16.7KB
 ![width = 300 (size = 16.7KB)](https://images.getlionel.com/https://raw.githubusercontent.com/li0nel/terraform-aws-cloudfront-image-compression/master/image.png?width=300)
 
+* width 200px, size 8.4KB
 ![width = 200 (size = 8.4KB)](https://images.getlionel.com/https://raw.githubusercontent.com/li0nel/terraform-aws-cloudfront-image-compression/master/image.png?width=200)
 
+* width 100px, size 3.1KB
 ![width = 100 (size = 3.1KB)](https://images.getlionel.com/https://raw.githubusercontent.com/li0nel/terraform-aws-cloudfront-image-compression/master/image.png?width=100)
 
 ## Usage

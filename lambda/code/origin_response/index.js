@@ -73,6 +73,10 @@ exports.handler = (event, context, callback) => {
                                     'cache-control': [{
                                         key: 'Cache-Control',
                                         value: 'max-age=100'
+                                    }],
+                                    'content-type': [{
+                                        key: 'Content-Type',
+                                        value: 'image/jpeg'
                                     }]
                                 },
                                 status: '200',
