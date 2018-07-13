@@ -1,8 +1,8 @@
 aws_profile = "default"
 
-aws_region = "eu-west-1"
+aws_region = "eu-west-2"
 
-stack_name = "kompressor"
+stack_name = "image-compression"
 
 domain = "getlionel.com"
 

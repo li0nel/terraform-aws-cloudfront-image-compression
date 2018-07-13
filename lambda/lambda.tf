@@ -6,6 +6,10 @@ variable "aws_profile" {
   type = "string"
 }
 
+variable "s3_bucket_endpoint" {
+  type = "string"
+}
+
 provider "aws" {
   region  = "us-east-1"
   profile = "${var.aws_profile}"
@@ -59,6 +63,19 @@ resource "aws_iam_role_policy" "lambda_role_policy" {
 EOF
 }
 
+data "template_file" "indexjs" {
+  template = "${file("${path.module}/code/origin_response/index.tpl.js")}"
+
+  vars {
+    s3_website_endpoint = "${var.s3_bucket_endpoint}"
+  }
+}
+
+resource "local_file" "indexjs" {
+  content     = "${data.template_file.indexjs.rendered}"
+  filename = "${path.module}/code/origin_response/index.js"
+}
+
 // origin response
 data "archive_file" "lambda_origin_response" {
   type        = "zip"
@@ -68,12 +85,12 @@ data "archive_file" "lambda_origin_response" {
 
 resource "aws_lambda_function" "origin_response" {
   filename         = "${data.archive_file.lambda_origin_response.output_path}"
-  function_name    = "origin_response-${var.stack_name}"
+  function_name    = "origin_response-${var.stack_name}-image-compression"
   role             = "${aws_iam_role.iam_for_lambda.arn}"
   handler          = "index.handler"
   runtime          = "nodejs6.10"
   source_code_hash = "${base64sha256(file("${data.archive_file.lambda_origin_response.output_path}"))}"
   publish          = true
-  timeout          = 5
+  timeout          = 15
   provider         = "aws.us-east-1"
 }

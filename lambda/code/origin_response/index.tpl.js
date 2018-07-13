@@ -27,7 +27,7 @@ exports.handler = (event, context, callback) => {
         const width = Math.min(options.width || maxSize, maxSize)
         const height = Math.min(options.height || maxSize, maxSize)
         const webp = options.webp == 1
-        const source_url = 'http://image-compression-images-20180712153821592500000001.s3-website.eu-west-2.amazonaws.com' + request.uri
+        const source_url = 'http://${s3_website_endpoint}' + request.uri
 
         console.log(source_url)
 

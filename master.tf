@@ -11,15 +11,6 @@ provider "aws" {
   version = "~> 1.9"
 }
 
-//resource "aws_s3_bucket" "pixel_logs" {
-//  bucket_prefix = "${var.stack_name}-pixel-logs-"
-//  acl           = "private"
-//
-//  tags {
-//    "app_name" = "${var.stack_name}"
-//  }
-//}
-
 data "aws_acm_certificate" "certificate" {
   domain      = "${var.subdomain}.${var.domain}"
   types       = ["AMAZON_ISSUED"]
@@ -46,7 +37,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
 //  logging_config {
 //    include_cookies = true
-//    bucket          = "${aws_s3_bucket.pixel_logs.bucket_domain_name}"
+//    bucket          = "${aws_s3_bucket.images_logs.bucket_domain_name}"
 //  }
 
   aliases = ["${var.subdomain}.${var.domain}"]
@@ -116,10 +107,15 @@ resource "aws_s3_bucket" "images" {
     index_document = "index.html"
     error_document = "index.html"
   }
+
+  provisioner "local-exec" {
+    command = "aws --region ${var.aws_region} --profile ${var.aws_profile} s3 cp image.png s3://${aws_s3_bucket.images.bucket} --acl=public-read"
+  }
 }
 
 module "lambda" {
   source = "./lambda"
   stack_name = "${var.stack_name}"
   aws_profile = "${var.aws_profile}"
+  s3_bucket_endpoint = "${aws_s3_bucket.images.website_endpoint}"
 }

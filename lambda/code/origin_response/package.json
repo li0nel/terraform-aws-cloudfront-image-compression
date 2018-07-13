@@ -10,8 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "querystring": "^0.2.0",
-    "sharp": "^0.20.3",
-    "unique-filename": "^1.1.0"
+    "sharp": "^0.20.3"
   },
   "devDependencies": {},
   "description": ""
