@@ -85,7 +85,7 @@ data "archive_file" "lambda_origin_response" {
 
 resource "aws_lambda_function" "origin_response" {
   filename         = "${data.archive_file.lambda_origin_response.output_path}"
-  function_name    = "origin_response-${var.stack_name}-image-compression"
+  function_name    = "origin_response-${var.stack_name}"
   role             = "${aws_iam_role.iam_for_lambda.arn}"
   handler          = "index.handler"
   runtime          = "nodejs6.10"
