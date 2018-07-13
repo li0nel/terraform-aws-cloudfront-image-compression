@@ -4,9 +4,9 @@ This Terraform script lets you deploy a Lambda function on CloudFront that will 
 You can use the Lambda function on an existing distribution, or create a separate one to serve your files stored in S3.
 To do so, prefix all your images with `https://images.your_domain.com/` to compress them on the fly, for example:
 
-`https://images.your_domain.com/https://a_random_image_from_anywhere?width=200`
+`https://images.your_domain.com/image_in_my_bucket.png?width=200&webp=1`
 
-... will compress then cache the origin image to a width of 200px and a preserved aspect ratio.
+... will compress then cache the origin image to a 200px-wide WebP image with a preserved aspect ratio.
 
 Great to generate [responsive images tags](https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images) from one single image.
 
@@ -31,20 +31,27 @@ This CloudFront-based Lambda function will let you update the image size at any 
 
 For an original image of 527KB:
 * width 400px, size 26KB
-![width = 400 (size = 26KB)](https://images.getlionel.com/https://raw.githubusercontent.com/li0nel/terraform-aws-cloudfront-image-compression/master/image.png?width=400)
+![width = 400 (size = 26KB)](https://images.getlionel.com/image.png?width=400)
 
 * width 300px, size 16.7KB
-![width = 300 (size = 16.7KB)](https://images.getlionel.com/https://raw.githubusercontent.com/li0nel/terraform-aws-cloudfront-image-compression/master/image.png?width=300)
+![width = 300 (size = 16.7KB)](https://images.getlionel.com/image.png?width=300)
 
 * width 200px, size 8.4KB
-![width = 200 (size = 8.4KB)](https://images.getlionel.com/https://raw.githubusercontent.com/li0nel/terraform-aws-cloudfront-image-compression/master/image.png?width=200)
+![width = 200 (size = 8.4KB)](https://images.getlionel.com/image.png?width=200)
 
 * width 100px, size 3.1KB
-![width = 100 (size = 3.1KB)](https://images.getlionel.com/https://raw.githubusercontent.com/li0nel/terraform-aws-cloudfront-image-compression/master/image.png?width=100)
+![width = 100 (size = 3.1KB)](https://images.getlionel.com/image.png?width=100)
 
 ## Usage
 
 Clone this Terraform files and replace variables in `terraform.tfvars` by your own values.
+
+Edit: You need to replace node_modules/sharp by a version compiled on a compatible operating system, so the build is compatible with Lambda execution environment.
+I will document this later, in the mean time, know that you can build it on a `ami-489f8e2c`:
+
+```bash
+docker-machine create -d amazonec2 --amazonec2-access-key YOUR_ACCESS_KEY --amazonec2-secret-key YOUR_SECRET_KEY --amazonec2-instance-type t2.small --amazonec2-ami ami-489f8e2c --amazonec2-region eu-west-2 buildmachine
+```
 
 ```bash
 cd lambda/code/origin_response
